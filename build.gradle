@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'karlstoolbox.net'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation "io.reactivex.rxjava3:rxjava:3.0.0-RC1"
+}
+
+mainClassName = 'rxjava.examples.HelloWorld'
