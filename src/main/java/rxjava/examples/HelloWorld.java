@@ -1,6 +1,7 @@
 package rxjava.examples;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,37 +12,33 @@ import static io.reactivex.Flowable.interval;
 
 public class HelloWorld {
     public static void main(String[] args) throws Exception {
-//        Flowable<String> f = Flowable.just("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
 
-        String[] arr = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
-//        Flowable<String> f = Flowable.fromArray(arr);
-//        Flowable<String> f = Flowable.fromArray("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
-//        Flowable<Long> f = Flowable.fromCallable(() -> System.currentTimeMillis());
-        Integer a[] = new Integer[] { 10, 20, 30, 40 };
-        List<Integer> list = new ArrayList<>();
-        list.add(10);
-        list.add(12);
-        list.add(14);
-        list.add(16);
+        final int maxNum = 1000000;
+        Single<Long> numbers = Flowable.fromCallable(() -> (int)(Math.random() * maxNum) + 1)
+                .repeat(maxNum)
+                .distinct()
+                .timeout(100L, TimeUnit.MILLISECONDS)
+                .count();
+        numbers.subscribe(new DebugSingleObserver<>());
 
-//        List<String> words = Arrays.asList(
-//            "12","q23"
-//        );
-//        Flowable<String> f = Flowable.fromIterable(Arrays.asList(
-//                "the",
-//                "quick",
-//                "brown",
-//                "fox",
-//                "jumps",
-//                "over",
-//                "the",
-//                "lazy",
-//                "dog"
-//        ));
 
-        Flowable<Long> f = Flowable.interval(1000L, TimeUnit.MILLISECONDS);
-        f = f.take(3);
-        f.subscribe(new DebugSubscriber<>());
-        Thread.sleep(5000L);
+        Flowable<String> sequences = Flowable.interval(100L, TimeUnit.MILLISECONDS)
+                .repeat()
+                .skip(1)
+                .take(10)
+                .map(Object::toString);
+        Flowable<String> names = Flowable.fromIterable(Arrays.asList(
+                    "Emma",
+                    "Liam",
+                    "Noah",
+                    "Ava",
+                    "Lucas",
+                    "Amelia",
+                    "Mia"
+                )).repeat()
+                .take(10);
+        Flowable<String> combined = Flowable.zip(sequences, names, (data1, data2) -> data1 + " " + data2);
+        combined.subscribe(new DebugSubscriber<>());
+        Thread.sleep(1500L);
     }
 }
